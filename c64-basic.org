@@ -1,0 +1,839 @@
+* Org                                                              :noexport:
+  #+TITLE: C64 BASIC Programs
+  #+AUTHOR: Kyle W T Sherman
+  #+EMAIL: kylewsherman@gmail.com
+  #+FILENAME: c64-basic.org
+  #+DESCRIPTION: Org/Babel 'Literate' Version of C64 BASIC Programs
+  #+KEYWORDS: emacs, org-mode, babel, basic, commodore 64, c64, programming language, literate programming, reproducible research
+  #+LANGUAGE: en
+  #+PROPERTY: header-args :tangle no :noweb yes :padline yes :comments none :results silent :dir /tmp :mkdirp yes
+  #+STARTUP: noindent odd overview
+  #+TIMESTAMP: <2023-07-08 13:01 (kyle)>
+
+  Steps to create a d64 image containing a BASIC program:
+
+  #+BEGIN_SRC sh
+    # Program: NAME.bas
+    petcat -w2 -o NAME.prg -- NAME.bas
+    c1541 -format "NAME,1" d64 NAME.d64
+    c1541 -attach NAME.d64 -write NAME.prg
+    x64sc NAME.d64
+  #+END_SRC
+
+* Constants
+  :PROPERTIES:
+  :CUSTOM_ID: constants
+  :END:
+
+*** Author
+    :PROPERTIES:
+    :CUSTOM_ID: constants-author
+    :END:
+
+    #+NAME: author
+    #+BEGIN_SRC org
+      Kyle W T Sherman
+    #+END_SRC
+
+*** Copyright
+    :PROPERTIES:
+    :CUSTOM_ID: constants-copyright
+    :END:
+
+    #+NAME: year
+    #+BEGIN_SRC emacs-lisp
+      (format-time-string "%Y" nil t)
+    #+END_SRC
+
+    #+NAME: year-range
+    #+BEGIN_SRC emacs-lisp :var start-year="2023"
+      (if (string= "<<year()>>" start-year)
+          start-year
+        (concat start-year "-<<year()>>"))
+    #+END_SRC
+
+    #+NAME: copyright
+    #+BEGIN_SRC org
+      Copyright © <<year-range()>> <<author>>
+    #+END_SRC
+
+*** Header
+    :PROPERTIES:
+    :CUSTOM_ID: constants-header
+    :END:
+
+    #+NAME: header
+    #+BEGIN_SRC org
+      11 REM <<copyright>>
+      12 REM MIT License
+    #+END_SRC
+
+*** License Header
+    :PROPERTIES:
+    :CUSTOM_ID: constants-license-header
+    :END:
+
+    #+NAME: license-header
+    #+BEGIN_SRC text
+      The MIT License (MIT)
+
+      <<copyright>>
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the “Software”), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in all
+      copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+      SOFTWARE.
+    #+END_SRC
+
+* Programs
+  :PROPERTIES:
+  :CUSTOM_ID: programs
+  :END:
+
+*** Hello World
+    :PROPERTIES:
+    :CUSTOM_ID: programs-hello-world
+    :END:
+
+***** Makefile
+      :PROPERTIES:
+      :CUSTOM_ID: programs-hello-world-makefile
+      :END:
+
+      #+BEGIN_SRC makefile :tangle hello-world/Makefile
+        .RECIPEPREFIX = >
+
+        all: helloworld.prg
+
+        helloworld.prg:
+        > cat helloworld.bas | tr '[A-Z]' '[a-z]' > helloworld.tmp
+        > petcat -w2 -o helloworld.prg -- helloworld.tmp
+
+        clean:
+        > rm -f *.prg *.tmp
+      #+END_SRC
+
+***** helloworld
+      :PROPERTIES:
+      :CUSTOM_ID: programs-hello-world-helloworld
+      :END:
+
+      #+BEGIN_SRC basic :tangle hello-world/helloworld.bas
+        10 REM Hello World
+        20 PRINT "Hello World!"
+      #+END_SRC
+
+***** Build and Run
+      :PROPERTIES:
+      :CUSTOM_ID: programs-hello-world-build-and-run
+      :END:
+
+      #+BEGIN_SRC sh :dir (file-name-directory buffer-file-name)
+        cd hello-world
+        make clean && make && x64sc helloworld.prg &
+      #+END_SRC
+
+*** Screen Size
+    :PROPERTIES:
+    :CUSTOM_ID: programs-screen-size
+    :END:
+
+***** Makefile
+      :PROPERTIES:
+      :CUSTOM_ID: programs-screen-size-makefile
+      :END:
+
+      #+BEGIN_SRC makefile :tangle screen-size/Makefile
+        .RECIPEPREFIX = >
+
+        all: screensize.prg
+
+        screensize.prg:
+        > cat screensize.bas | tr '[A-Z]' '[a-z]' > screensize.tmp
+        > petcat -w2 -o screensize.prg -- screensize.tmp
+
+        clean:
+        > rm -f *.prg *.tmp
+      #+END_SRC
+
+***** screensize
+      :PROPERTIES:
+      :CUSTOM_ID: programs-screen-size-screensize
+      :END:
+
+      #+BEGIN_SRC basic :tangle screen-size/screensize.bas
+        10 REM Screen Size
+        20 PRINT CHR$(147);
+        100 FOR X = 1 TO 40
+        110 IF X - INT(X / 10) * 10 = 0 THEN 120
+        111 PRINT " ";
+        112 GOTO 130
+        120 PRINT CHR$(48 + X / 10);
+        130 NEXT X
+        200 FOR T = 1 TO 4
+        210 FOR X = 1 TO 10
+        220 IF X = 10 THEN PRINT "0";
+        220 IF X <> 10 THEN PRINT CHR$(48 + X);
+        230 NEXT X
+        240 NEXT T
+        300 FOR Y = 3 TO 25
+        310 IF Y > 3 THEN PRINT
+        320 PRINT Y;
+        330 NEXT Y
+        400 INPUT Z$
+      #+END_SRC
+
+***** Build and Run
+      :PROPERTIES:
+      :CUSTOM_ID: programs-screen-size-build-and-run
+      :END:
+
+      #+BEGIN_SRC sh :dir (file-name-directory buffer-file-name)
+        cd screen-size
+        make clean && make && x64sc screensize.prg &
+      #+END_SRC
+
+*** Wordle
+    :PROPERTIES:
+    :CUSTOM_ID: programs-wordle
+    :END:
+
+***** Makefile
+      :PROPERTIES:
+      :CUSTOM_ID: programs-wordle-makefile
+      :END:
+
+      #+BEGIN_SRC makefile :tangle wordle/Makefile
+        .RECIPEPREFIX = >
+
+        all: wordle.prg
+
+        wordle.prg:
+        > cat wordle.bas | tr '[A-Z]' '[a-z]' > wordle.tmp
+        > petcat -w2 -o wordle.prg -- wordle.tmp
+
+        clean:
+        > rm -f *.prg *.tmp
+      #+END_SRC
+
+***** Wordle
+      :PROPERTIES:
+      :CUSTOM_ID: programs-wordle-wordle
+      :END:
+
+      #+BEGIN_SRC basic :tangle wordle/wordle.bas
+        10 REM Wordle
+        <<header>>
+        20 PRINT CHR$(147) : REM clear screen
+        21 POKE 53280, 0 : REM black screenframe
+        22 POKE 53281, 0 : REM black screen
+        23 POKE 646, 1 : REM white text
+        30 R = RND(0)
+        100 PRINT "WORDLE"
+        101 PRINT
+        110 R = INT(RND(1) * 2309) + 1 : REM random word number
+        111 N = 0 : REM number of guesses
+        120 DIM L$(5) : REM letters in word
+        120 DIM C$(5) : REM letters in current guess
+        121 DIM M(5) : REM matching letters for current guess
+        210 FOR I = 1 TO R
+        211 READ W$ : REM random word
+        212 NEXT
+        220 FOR I = 1 TO 5
+        221 L$(I) = MID$(W$, I, 1)
+        222 NEXT I
+        300 INPUT "Guess"; G$
+        301 N = N + 1
+        310 IF LEN(G$) <> 5 GOTO 300
+        320 FOR I = 1 TO 5
+        321 C$(I) = MID$(G$, I, 1) : REM current guess letters
+        322 M(I) = 0 : REM set to no match
+        323 NEXT I
+        330 FOR I = 1 TO 5
+        340 IF L$(I) <> C$(I) GOTO 350
+        341 M(I) = I : REM letter and position match
+        342 GOTO 390
+        350 J = 0
+        360 J = J + 1
+        361 IF J > 5 GOTO 390
+        362 IF J = I GOTO 360
+        370 IF L$(I) = C$(J) GOTO 380
+        371 GOTO 360 : REM no match
+        380 IF M(J) > 0 GOTO 360 : REM previous letter match
+        381 M(J) = I : REM letter but not position match
+        382 GOTO 390
+        390 NEXT I
+        400 C = 0
+        410 PRINT "       ";
+        411 FOR I = 1 TO 5
+        412 IF M(I) = I THEN POKE 646,5 : PRINT C$(I); : C = C + 1 : GOTO 420
+        413 IF M(I) > 0 THEN POKE 646,8 : PRINT C$(I); : GOTO 420
+        414 POKE 646,1 : PRINT "-";
+        420 NEXT I
+        421 PRINT
+        422 POKE 646,1
+        430 IF C <> 5 GOTO 300
+        440 PRINT : PRINT "You guessed the word in"; STR$(N); " tries"
+      #+END_SRC
+
+***** Word List
+      :PROPERTIES:
+      :CUSTOM_ID: programs-wordle-word-list
+      :END:
+
+      #+BEGIN_SRC basic :tangle wordle/wordle.bas
+        1000 REM word list
+        1001 DATA "aback", "abase", "abate", "abbey", "abbot"
+        1002 DATA "abhor", "abide", "abled", "abode", "abort"
+        1003 DATA "about", "above", "abuse", "abyss", "acorn"
+        1004 DATA "acrid", "actor", "acute", "adage", "adapt"
+        1005 DATA "adept", "admin", "admit", "adobe", "adopt"
+        1006 DATA "adore", "adorn", "adult", "affix", "afire"
+        1007 DATA "afoot", "afoul", "after", "again", "agape"
+        1008 DATA "agate", "agent", "agile", "aging", "aglow"
+        1009 DATA "agony", "agree", "ahead", "aider", "aisle"
+        1010 DATA "alarm", "album", "alert", "algae", "alibi"
+        1011 DATA "alien", "align", "alike", "alive", "allay"
+        1012 DATA "alley", "allot", "allow", "alloy", "aloft"
+        1013 DATA "alone", "along", "aloof", "aloud", "alpha"
+        1014 DATA "altar", "alter", "amass", "amaze", "amber"
+        1015 DATA "amble", "amend", "amiss", "amity", "among"
+        1016 DATA "ample", "amply", "amuse", "angel", "anger"
+        1017 DATA "angle", "angry", "angst", "anime", "ankle"
+        1018 DATA "annex", "annoy", "annul", "anode", "antic"
+        1019 DATA "anvil", "aorta", "apart", "aphid", "aping"
+        1020 DATA "apnea", "apple", "apply", "apron", "aptly"
+        1021 DATA "arbor", "ardor", "arena", "argue", "arise"
+        1022 DATA "armor", "aroma", "arose", "array", "arrow"
+        1023 DATA "arson", "artsy", "ascot", "ashen", "aside"
+        1024 DATA "askew", "assay", "asset", "atoll", "atone"
+        1025 DATA "attic", "audio", "audit", "augur", "aunty"
+        1026 DATA "avail", "avert", "avian", "avoid", "await"
+        1027 DATA "awake", "award", "aware", "awash", "awful"
+        1028 DATA "awoke", "axial", "axiom", "axion", "azure"
+        1029 DATA "bacon", "badge", "badly", "bagel", "baggy"
+        1030 DATA "baker", "baler", "balmy", "banal", "banjo"
+        1031 DATA "barge", "baron", "basal", "basic", "basil"
+        1032 DATA "basin", "basis", "baste", "batch", "bathe"
+        1033 DATA "baton", "batty", "bawdy", "bayou", "beach"
+        1034 DATA "beady", "beard", "beast", "beech", "beefy"
+        1035 DATA "befit", "began", "begat", "beget", "begin"
+        1036 DATA "begun", "being", "belch", "belie", "belle"
+        1037 DATA "belly", "below", "bench", "beret", "berry"
+        1038 DATA "berth", "beset", "betel", "bevel", "bezel"
+        1039 DATA "bible", "bicep", "biddy", "bigot", "bilge"
+        1040 DATA "billy", "binge", "bingo", "biome", "birch"
+        1041 DATA "birth", "bison", "bitty", "black", "blade"
+        1042 DATA "blame", "bland", "blank", "blare", "blast"
+        1043 DATA "blaze", "bleak", "bleat", "bleed", "bleep"
+        1044 DATA "blend", "bless", "blimp", "blind", "blink"
+        1045 DATA "bliss", "blitz", "bloat", "block", "bloke"
+        1046 DATA "blond", "blood", "bloom", "blown", "bluer"
+        1047 DATA "bluff", "blunt", "blurb", "blurt", "blush"
+        1048 DATA "board", "boast", "bobby", "boney", "bongo"
+        1049 DATA "bonus", "booby", "boost", "booth", "booty"
+        1050 DATA "booze", "boozy", "borax", "borne", "bosom"
+        1051 DATA "bossy", "botch", "bough", "boule", "bound"
+        1052 DATA "bowel", "boxer", "brace", "braid", "brain"
+        1053 DATA "brake", "brand", "brash", "brass", "brave"
+        1054 DATA "bravo", "brawl", "brawn", "bread", "break"
+        1055 DATA "breed", "briar", "bribe", "brick", "bride"
+        1056 DATA "brief", "brine", "bring", "brink", "briny"
+        1057 DATA "brisk", "broad", "broil", "broke", "brood"
+        1058 DATA "brook", "broom", "broth", "brown", "brunt"
+        1059 DATA "brush", "brute", "buddy", "budge", "buggy"
+        1060 DATA "bugle", "build", "built", "bulge", "bulky"
+        1061 DATA "bully", "bunch", "bunny", "burly", "burnt"
+        1062 DATA "burst", "bused", "bushy", "butch", "butte"
+        1063 DATA "buxom", "buyer", "bylaw"
+        1064 DATA "cabal", "cabby", "cabin", "cable", "cacao"
+        1065 DATA "cache", "cacti", "caddy", "cadet", "cagey"
+        1066 DATA "cairn", "camel", "cameo", "canal", "candy"
+        1067 DATA "canny", "canoe", "canon", "caper", "caput"
+        1068 DATA "carat", "cargo", "carol", "carry", "carve"
+        1069 DATA "caste", "catch", "cater", "catty", "caulk"
+        1070 DATA "cause", "cavil", "cease", "cedar", "cello"
+        1071 DATA "chafe", "chaff", "chain", "chair", "chalk"
+        1072 DATA "champ", "chant", "chaos", "chard", "charm"
+        1073 DATA "chart", "chase", "chasm", "cheap", "cheat"
+        1074 DATA "check", "cheek", "cheer", "chess", "chest"
+        1075 DATA "chick", "chide", "chief", "child", "chili"
+        1076 DATA "chill", "chime", "china", "chirp", "chock"
+        1077 DATA "choir", "choke", "chord", "chore", "chose"
+        1078 DATA "chuck", "chump", "chunk", "churn", "chute"
+        1079 DATA "cider", "cigar", "cinch", "circa", "civic"
+        1080 DATA "civil", "clack", "claim", "clamp", "clang"
+        1081 DATA "clank", "clash", "clasp", "class", "clean"
+        1082 DATA "clear", "cleat", "cleft", "clerk", "click"
+        1083 DATA "cliff", "climb", "cling", "clink", "cloak"
+        1084 DATA "clock", "clone", "close", "cloth", "cloud"
+        1085 DATA "clout", "clove", "clown", "cluck", "clued"
+        1086 DATA "clump", "clung", "coach", "coast", "cobra"
+        1087 DATA "cocoa", "colon", "color", "comet", "comfy"
+        1088 DATA "comic", "comma", "conch", "condo", "conic"
+        1089 DATA "copse", "coral", "corer", "corny", "couch"
+        1090 DATA "cough", "could", "count", "coupe", "court"
+        1091 DATA "coven", "cover", "covet", "covey", "cower"
+        1092 DATA "coyly", "crack", "craft", "cramp", "crane"
+        1093 DATA "crank", "crash", "crass", "crate", "crave"
+        1094 DATA "crawl", "craze", "crazy", "creak", "cream"
+        1095 DATA "credo", "creed", "creek", "creep", "creme"
+        1096 DATA "crepe", "crept", "cress", "crest", "crick"
+        1097 DATA "cried", "crier", "crime", "crimp", "crisp"
+        1098 DATA "croak", "crock", "crone", "crony", "crook"
+        1099 DATA "cross", "croup", "crowd", "crown", "crude"
+        1100 DATA "cruel", "crumb", "crump", "crush", "crust"
+        1101 DATA "crypt", "cubic", "cumin", "curio", "curly"
+        1102 DATA "curry", "curse", "curve", "curvy", "cutie"
+        1103 DATA "cyber", "cycle", "cynic"
+        1104 DATA "daddy", "daily", "dairy", "daisy", "dally"
+        1105 DATA "dance", "dandy", "datum", "daunt", "dealt"
+        1106 DATA "death", "debar", "debit", "debug", "debut"
+        1107 DATA "decal", "decay", "decor", "decoy", "decry"
+        1108 DATA "defer", "deign", "deity", "delay", "delta"
+        1109 DATA "delve", "demon", "demur", "denim", "dense"
+        1110 DATA "depot", "depth", "derby", "deter", "detox"
+        1111 DATA "deuce", "devil", "diary", "dicey", "digit"
+        1112 DATA "dilly", "dimly", "diner", "dingo", "dingy"
+        1113 DATA "diode", "dirge", "dirty", "disco", "ditch"
+        1114 DATA "ditto", "ditty", "diver", "dizzy", "dodge"
+        1115 DATA "dodgy", "dogma", "doing", "dolly", "donor"
+        1116 DATA "donut", "dopey", "doubt", "dough", "dowdy"
+        1117 DATA "dowel", "downy", "dowry", "dozen", "draft"
+        1118 DATA "drain", "drake", "drama", "drank", "drape"
+        1119 DATA "drawl", "drawn", "dread", "dream", "dress"
+        1120 DATA "dried", "drier", "drift", "drill", "drink"
+        1121 DATA "drive", "droit", "droll", "drone", "drool"
+        1122 DATA "droop", "dross", "drove", "drown", "druid"
+        1123 DATA "drunk", "dryer", "dryly", "duchy", "dully"
+        1124 DATA "dummy", "dumpy", "dunce", "dusky", "dusty"
+        1125 DATA "dutch", "duvet", "dwarf", "dwell", "dwelt"
+        1126 DATA "dying"
+        1127 DATA "eager", "eagle", "early", "earth", "easel"
+        1128 DATA "eaten", "eater", "ebony", "eclat", "edict"
+        1129 DATA "edify", "eerie", "egret", "eight", "eject"
+        1130 DATA "eking", "elate", "elbow", "elder", "elect"
+        1131 DATA "elegy", "elfin", "elide", "elite", "elope"
+        1132 DATA "elude", "email", "embed", "ember", "emcee"
+        1133 DATA "empty", "enact", "endow", "enema", "enemy"
+        1134 DATA "enjoy", "ennui", "ensue", "enter", "entry"
+        1135 DATA "envoy", "epoch", "epoxy", "equal", "equip"
+        1136 DATA "erase", "erect", "erode", "error", "erupt"
+        1137 DATA "essay", "ester", "ether", "ethic", "ethos"
+        1138 DATA "etude", "evade", "event", "every", "evict"
+        1139 DATA "evoke", "exact", "exalt", "excel", "exert"
+        1140 DATA "exile", "exist", "expel", "extol", "extra"
+        1141 DATA "exult", "eying"
+        1142 DATA "fable", "facet", "faint", "fairy", "faith"
+        1143 DATA "false", "fancy", "fanny", "farce", "fatal"
+        1144 DATA "fatty", "fault", "fauna", "favor", "feast"
+        1145 DATA "fecal", "feign", "fella", "felon", "femme"
+        1146 DATA "femur", "fence", "feral", "ferry", "fetal"
+        1147 DATA "fetch", "fetid", "fetus", "fever", "fewer"
+        1148 DATA "fiber", "ficus", "field", "fiend", "fiery"
+        1149 DATA "fifth", "fifty", "fight", "filer", "filet"
+        1150 DATA "filly", "filmy", "filth", "final", "finch"
+        1151 DATA "finer", "first", "fishy", "fixer", "fizzy"
+        1152 DATA "fjord", "flack", "flail", "flair", "flake"
+        1153 DATA "flaky", "flame", "flank", "flare", "flash"
+        1154 DATA "flask", "fleck", "fleet", "flesh", "flick"
+        1155 DATA "flier", "fling", "flint", "flirt", "float"
+        1156 DATA "flock", "flood", "floor", "flora", "floss"
+        1157 DATA "flour", "flout", "flown", "fluff", "fluid"
+        1158 DATA "fluke", "flume", "flung", "flunk", "flush"
+        1159 DATA "flute", "flyer", "foamy", "focal", "focus"
+        1160 DATA "foggy", "foist", "folio", "folly", "foray"
+        1161 DATA "force", "forge", "forgo", "forte", "forth"
+        1162 DATA "forty", "forum", "found", "foyer", "frail"
+        1163 DATA "frame", "frank", "fraud", "freak", "freed"
+        1164 DATA "freer", "fresh", "friar", "fried", "frill"
+        1165 DATA "frisk", "fritz", "frock", "frond", "front"
+        1166 DATA "frost", "froth", "frown", "froze", "fruit"
+        1167 DATA "fudge", "fugue", "fully", "fungi", "funky"
+        1168 DATA "funny", "furor", "furry", "fussy", "fuzzy"
+        1169 DATA "gaffe", "gaily", "gamer", "gamma", "gamut"
+        1170 DATA "gassy", "gaudy", "gauge", "gaunt", "gauze"
+        1171 DATA "gavel", "gawky", "gayer", "gayly", "gazer"
+        1172 DATA "gecko", "geeky", "geese", "genie", "genre"
+        1173 DATA "ghost", "ghoul", "giant", "giddy", "gipsy"
+        1174 DATA "girly", "girth", "given", "giver", "glade"
+        1175 DATA "gland", "glare", "glass", "glaze", "gleam"
+        1176 DATA "glean", "glide", "glint", "gloat", "globe"
+        1177 DATA "gloom", "glory", "gloss", "glove", "glyph"
+        1178 DATA "gnash", "gnome", "godly", "going", "golem"
+        1179 DATA "golly", "gonad", "goner", "goody", "gooey"
+        1180 DATA "goofy", "goose", "gorge", "gouge", "gourd"
+        1181 DATA "grace", "grade", "graft", "grail", "grain"
+        1182 DATA "grand", "grant", "grape", "graph", "grasp"
+        1183 DATA "grass", "grate", "grave", "gravy", "graze"
+        1184 DATA "great", "greed", "green", "greet", "grief"
+        1185 DATA "grill", "grime", "grimy", "grind", "gripe"
+        1186 DATA "groan", "groin", "groom", "grope", "gross"
+        1187 DATA "group", "grout", "grove", "growl", "grown"
+        1188 DATA "gruel", "gruff", "grunt", "guard", "guava"
+        1189 DATA "guess", "guest", "guide", "guild", "guile"
+        1190 DATA "guilt", "guise", "gulch", "gully", "gumbo"
+        1191 DATA "gummy", "guppy", "gusto", "gusty", "gypsy"
+        1192 DATA "habit", "hairy", "halve", "handy", "happy"
+        1193 DATA "hardy", "harem", "harpy", "harry", "harsh"
+        1194 DATA "haste", "hasty", "hatch", "hater", "haunt"
+        1195 DATA "haute", "haven", "havoc", "hazel", "heady"
+        1196 DATA "heard", "heart", "heath", "heave", "heavy"
+        1197 DATA "hedge", "hefty", "heist", "helix", "hello"
+        1198 DATA "hence", "heron", "hilly", "hinge", "hippo"
+        1199 DATA "hippy", "hitch", "hoard", "hobby", "hoist"
+        1200 DATA "holly", "homer", "honey", "honor", "horde"
+        1201 DATA "horny", "horse", "hotel", "hotly", "hound"
+        1202 DATA "house", "hovel", "hover", "howdy", "human"
+        1203 DATA "humid", "humor", "humph", "humus", "hunch"
+        1204 DATA "hunky", "hurry", "husky", "hussy", "hutch"
+        1205 DATA "hydro", "hyena", "hymen", "hyper"
+        1206 DATA "icily", "icing", "ideal", "idiom", "idiot"
+        1207 DATA "idler", "idyll", "igloo", "iliac", "image"
+        1208 DATA "imbue", "impel", "imply", "inane", "inbox"
+        1209 DATA "incur", "index", "inept", "inert", "infer"
+        1210 DATA "ingot", "inlay", "inlet", "inner", "input"
+        1211 DATA "inter", "intro", "ionic", "irate", "irony"
+        1212 DATA "islet", "issue", "itchy", "ivory"
+        1213 DATA "jaunt", "jazzy", "jelly", "jerky", "jetty"
+        1214 DATA "jewel", "jiffy", "joint", "joist", "joker"
+        1215 DATA "jolly", "joust", "judge", "juice", "juicy"
+        1216 DATA "jumbo", "jumpy", "junta", "junto", "juror"
+        1217 DATA "kappa", "karma", "kayak", "kebab", "khaki"
+        1218 DATA "kinky", "kiosk", "kitty", "knack", "knave"
+        1219 DATA "knead", "kneed", "kneel", "knelt", "knife"
+        1220 DATA "knock", "knoll", "known", "koala", "krill"
+        1221 DATA "label", "labor", "laden", "ladle", "lager"
+        1222 DATA "lance", "lanky", "lapel", "lapse", "large"
+        1223 DATA "larva", "lasso", "latch", "later", "lathe"
+        1224 DATA "latte", "laugh", "layer", "leach", "leafy"
+        1225 DATA "leaky", "leant", "leapt", "learn", "lease"
+        1226 DATA "leash", "least", "leave", "ledge", "leech"
+        1227 DATA "leery", "lefty", "legal", "leggy", "lemon"
+        1228 DATA "lemur", "leper", "level", "lever", "libel"
+        1229 DATA "liege", "light", "liken", "lilac", "limbo"
+        1230 DATA "limit", "linen", "liner", "lingo", "lipid"
+        1231 DATA "lithe", "liver", "livid", "llama", "loamy"
+        1232 DATA "loath", "lobby", "local", "locus", "lodge"
+        1233 DATA "lofty", "logic", "login", "loopy", "loose"
+        1234 DATA "lorry", "loser", "louse", "lousy", "lover"
+        1235 DATA "lower", "lowly", "loyal", "lucid", "lucky"
+        1236 DATA "lumen", "lumpy", "lunar", "lunch", "lunge"
+        1237 DATA "lupus", "lurch", "lurid", "lusty", "lying"
+        1238 DATA "lymph", "lyric"
+        1239 DATA "macaw", "macho", "macro", "madam", "madly"
+        1240 DATA "mafia", "magic", "magma", "maize", "major"
+        1241 DATA "maker", "mambo", "mamma", "mammy", "manga"
+        1242 DATA "mange", "mango", "mangy", "mania", "manic"
+        1243 DATA "manly", "manor", "maple", "march", "marry"
+        1244 DATA "marsh", "mason", "masse", "match", "matey"
+        1245 DATA "mauve", "maxim", "maybe", "mayor", "mealy"
+        1246 DATA "meant", "meaty", "mecca", "medal", "media"
+        1247 DATA "medic", "melee", "melon", "mercy", "merge"
+        1248 DATA "merit", "merry", "metal", "meter", "metro"
+        1249 DATA "micro", "midge", "midst", "might", "milky"
+        1250 DATA "mimic", "mince", "miner", "minim", "minor"
+        1251 DATA "minty", "minus", "mirth", "miser", "missy"
+        1252 DATA "mocha", "modal", "model", "modem", "mogul"
+        1253 DATA "moist", "molar", "moldy", "money", "month"
+        1254 DATA "moody", "moose", "moral", "moron", "morph"
+        1255 DATA "mossy", "motel", "motif", "motor", "motto"
+        1256 DATA "moult", "mound", "mount", "mourn", "mouse"
+        1257 DATA "mouth", "mover", "movie", "mower", "mucky"
+        1258 DATA "mucus", "muddy", "mulch", "mummy", "munch"
+        1259 DATA "mural", "murky", "mushy", "music", "musky"
+        1260 DATA "musty", "myrrh"
+        1261 DATA "nadir", "naive", "nanny", "nasal", "nasty"
+        1262 DATA "natal", "naval", "navel", "needy", "neigh"
+        1263 DATA "nerdy", "nerve", "never", "newer", "newly"
+        1264 DATA "nicer", "niche", "niece", "night", "ninja"
+        1265 DATA "ninny", "ninth", "noble", "nobly", "noise"
+        1266 DATA "noisy", "nomad", "noose", "north", "nosey"
+        1267 DATA "notch", "novel", "nudge", "nurse", "nutty"
+        1268 DATA "nylon", "nymph"
+        1269 DATA "oaken", "obese", "occur", "ocean", "octal"
+        1270 DATA "octet", "odder", "oddly", "offal", "offer"
+        1271 DATA "often", "olden", "older", "olive", "ombre"
+        1272 DATA "omega", "onion", "onset", "opera", "opine"
+        1273 DATA "opium", "optic", "orbit", "order", "organ"
+        1274 DATA "other", "otter", "ought", "ounce", "outdo"
+        1275 DATA "outer", "outgo", "ovary", "ovate", "overt"
+        1276 DATA "ovine", "ovoid", "owing", "owner", "oxide"
+        1277 DATA "ozone"
+        1278 DATA "paddy", "pagan", "paint", "paler", "palsy"
+        1279 DATA "panel", "panic", "pansy", "papal", "paper"
+        1280 DATA "parer", "parka", "parry", "parse", "party"
+        1281 DATA "pasta", "paste", "pasty", "patch", "patio"
+        1282 DATA "patsy", "patty", "pause", "payee", "payer"
+        1283 DATA "peace", "peach", "pearl", "pecan", "pedal"
+        1284 DATA "penal", "pence", "penne", "penny", "perch"
+        1285 DATA "peril", "perky", "pesky", "pesto", "petal"
+        1286 DATA "petty", "phase", "phone", "phony", "photo"
+        1287 DATA "piano", "picky", "piece", "piety", "piggy"
+        1288 DATA "pilot", "pinch", "piney", "pinky", "pinto"
+        1289 DATA "piper", "pique", "pitch", "pithy", "pivot"
+        1290 DATA "pixel", "pixie", "pizza", "place", "plaid"
+        1291 DATA "plain", "plait", "plane", "plank", "plant"
+        1292 DATA "plate", "plaza", "plead", "pleat", "plied"
+        1293 DATA "plier", "pluck", "plumb", "plume", "plump"
+        1294 DATA "plunk", "plush", "poesy", "point", "poise"
+        1295 DATA "poker", "polar", "polka", "polyp", "pooch"
+        1296 DATA "poppy", "porch", "poser", "posit", "posse"
+        1297 DATA "pouch", "pound", "pouty", "power", "prank"
+        1298 DATA "prawn", "preen", "press", "price", "prick"
+        1299 DATA "pride", "pried", "prime", "primo", "print"
+        1300 DATA "prior", "prism", "privy", "prize", "probe"
+        1301 DATA "prone", "prong", "proof", "prose", "proud"
+        1302 DATA "prove", "prowl", "proxy", "prude", "prune"
+        1303 DATA "psalm", "pubic", "pudgy", "puffy", "pulpy"
+        1304 DATA "pulse", "punch", "pupil", "puppy", "puree"
+        1305 DATA "purer", "purge", "purse", "pushy", "putty"
+        1306 DATA "pygmy"
+        1307 DATA "quack", "quail", "quake", "qualm", "quark"
+        1308 DATA "quart", "quash", "quasi", "queen", "queer"
+        1309 DATA "quell", "query", "quest", "queue", "quick"
+        1310 DATA "quiet", "quill", "quilt", "quirk", "quite"
+        1311 DATA "quota", "quote", "quoth"
+        1312 DATA "rabbi", "rabid", "racer", "radar", "radii"
+        1313 DATA "radio", "rainy", "raise", "rajah", "rally"
+        1314 DATA "ralph", "ramen", "ranch", "randy", "range"
+        1315 DATA "rapid", "rarer", "raspy", "ratio", "ratty"
+        1316 DATA "raven", "rayon", "razor", "reach", "react"
+        1317 DATA "ready", "realm", "rearm", "rebar", "rebel"
+        1318 DATA "rebus", "rebut", "recap", "recur", "recut"
+        1319 DATA "reedy", "refer", "refit", "regal", "rehab"
+        1320 DATA "reign", "relax", "relay", "relic", "remit"
+        1321 DATA "renal", "renew", "repay", "repel", "reply"
+        1322 DATA "rerun", "reset", "resin", "retch", "retro"
+        1323 DATA "retry", "reuse", "revel", "revue", "rhino"
+        1324 DATA "rhyme", "rider", "ridge", "rifle", "right"
+        1325 DATA "rigid", "rigor", "rinse", "ripen", "riper"
+        1326 DATA "risen", "riser", "risky", "rival", "river"
+        1327 DATA "rivet", "roach", "roast", "robin", "robot"
+        1328 DATA "rocky", "rodeo", "roger", "rogue", "roomy"
+        1329 DATA "roost", "rotor", "rouge", "rough", "round"
+        1330 DATA "rouse", "route", "rover", "rowdy", "rower"
+        1331 DATA "royal", "ruddy", "ruder", "rugby", "ruler"
+        1332 DATA "rumba", "rumor", "rupee", "rural", "rusty"
+        1333 DATA "sadly", "safer", "saint", "salad", "sally"
+        1334 DATA "salon", "salsa", "salty", "salve", "salvo"
+        1335 DATA "sandy", "saner", "sappy", "sassy", "satin"
+        1336 DATA "satyr", "sauce", "saucy", "sauna", "saute"
+        1337 DATA "savor", "savoy", "savvy", "scald", "scale"
+        1338 DATA "scalp", "scaly", "scamp", "scant", "scare"
+        1339 DATA "scarf", "scary", "scene", "scent", "scion"
+        1340 DATA "scoff", "scold", "scone", "scoop", "scope"
+        1341 DATA "score", "scorn", "scour", "scout", "scowl"
+        1342 DATA "scram", "scrap", "scree", "screw", "scrub"
+        1343 DATA "scrum", "scuba", "sedan", "seedy", "segue"
+        1344 DATA "seize", "semen", "sense", "sepia", "serif"
+        1345 DATA "serum", "serve", "setup", "seven", "sever"
+        1346 DATA "sewer", "shack", "shade", "shady", "shaft"
+        1347 DATA "shake", "shaky", "shale", "shall", "shalt"
+        1348 DATA "shame", "shank", "shape", "shard", "share"
+        1349 DATA "shark", "sharp", "shave", "shawl", "shear"
+        1350 DATA "sheen", "sheep", "sheer", "sheet", "sheik"
+        1351 DATA "shelf", "shell", "shied", "shift", "shine"
+        1352 DATA "shiny", "shire", "shirk", "shirt", "shoal"
+        1353 DATA "shock", "shone", "shook", "shoot", "shore"
+        1354 DATA "shorn", "short", "shout", "shove", "shown"
+        1355 DATA "showy", "shrew", "shrub", "shrug", "shuck"
+        1356 DATA "shunt", "shush", "shyly", "siege", "sieve"
+        1357 DATA "sight", "sigma", "silky", "silly", "since"
+        1358 DATA "sinew", "singe", "siren", "sissy", "sixth"
+        1359 DATA "sixty", "skate", "skier", "skiff", "skill"
+        1360 DATA "skimp", "skirt", "skulk", "skull", "skunk"
+        1361 DATA "slack", "slain", "slang", "slant", "slash"
+        1362 DATA "slate", "sleek", "sleep", "sleet", "slept"
+        1363 DATA "slice", "slick", "slide", "slime", "slimy"
+        1364 DATA "sling", "slink", "sloop", "slope", "slosh"
+        1365 DATA "sloth", "slump", "slung", "slunk", "slurp"
+        1366 DATA "slush", "slyly", "smack", "small", "smart"
+        1367 DATA "smash", "smear", "smell", "smelt", "smile"
+        1368 DATA "smirk", "smite", "smith", "smock", "smoke"
+        1369 DATA "smoky", "smote", "snack", "snail", "snake"
+        1370 DATA "snaky", "snare", "snarl", "sneak", "sneer"
+        1371 DATA "snide", "sniff", "snipe", "snoop", "snore"
+        1372 DATA "snort", "snout", "snowy", "snuck", "snuff"
+        1373 DATA "soapy", "sober", "soggy", "solar", "solid"
+        1374 DATA "solve", "sonar", "sonic", "sooth", "sooty"
+        1375 DATA "sorry", "sound", "south", "sower", "space"
+        1376 DATA "spade", "spank", "spare", "spark", "spasm"
+        1377 DATA "spawn", "speak", "spear", "speck", "speed"
+        1378 DATA "spell", "spelt", "spend", "spent", "sperm"
+        1379 DATA "spice", "spicy", "spied", "spiel", "spike"
+        1380 DATA "spiky", "spill", "spilt", "spine", "spiny"
+        1381 DATA "spire", "spite", "splat", "split", "spoil"
+        1382 DATA "spoke", "spoof", "spook", "spool", "spoon"
+        1383 DATA "spore", "sport", "spout", "spray", "spree"
+        1384 DATA "sprig", "spunk", "spurn", "spurt", "squad"
+        1385 DATA "squat", "squib", "stack", "staff", "stage"
+        1386 DATA "staid", "stain", "stair", "stake", "stale"
+        1387 DATA "stalk", "stall", "stamp", "stand", "stank"
+        1388 DATA "stare", "stark", "start", "stash", "state"
+        1389 DATA "stave", "stead", "steak", "steal", "steam"
+        1390 DATA "steed", "steel", "steep", "steer", "stein"
+        1391 DATA "stern", "stick", "stiff", "still", "stilt"
+        1392 DATA "sting", "stink", "stint", "stock", "stoic"
+        1393 DATA "stoke", "stole", "stomp", "stone", "stony"
+        1394 DATA "stood", "stool", "stoop", "store", "stork"
+        1395 DATA "storm", "story", "stout", "stove", "strap"
+        1396 DATA "straw", "stray", "strip", "strut", "stuck"
+        1397 DATA "study", "stuff", "stump", "stung", "stunk"
+        1398 DATA "stunt", "style", "suave", "sugar", "suing"
+        1399 DATA "suite", "sulky", "sully", "sumac", "sunny"
+        1400 DATA "super", "surer", "surge", "surly", "sushi"
+        1401 DATA "swami", "swamp", "swarm", "swash", "swath"
+        1402 DATA "swear", "sweat", "sweep", "sweet", "swell"
+        1403 DATA "swept", "swift", "swill", "swine", "swing"
+        1404 DATA "swirl", "swish", "swoon", "swoop", "sword"
+        1405 DATA "swore", "sworn", "swung", "synod", "syrup"
+        1406 DATA "tabby", "table", "taboo", "tacit", "tacky"
+        1407 DATA "taffy", "taint", "taken", "taker", "tally"
+        1408 DATA "talon", "tamer", "tango", "tangy", "taper"
+        1409 DATA "tapir", "tardy", "tarot", "taste", "tasty"
+        1410 DATA "tatty", "taunt", "tawny", "teach", "teary"
+        1411 DATA "tease", "teddy", "teeth", "tempo", "tenet"
+        1412 DATA "tenor", "tense", "tenth", "tepee", "tepid"
+        1413 DATA "terra", "terse", "testy", "thank", "theft"
+        1414 DATA "their", "theme", "there", "these", "theta"
+        1415 DATA "thick", "thief", "thigh", "thing", "think"
+        1416 DATA "third", "thong", "thorn", "those", "three"
+        1417 DATA "threw", "throb", "throw", "thrum", "thumb"
+        1418 DATA "thump", "thyme", "tiara", "tibia", "tidal"
+        1419 DATA "tiger", "tight", "tilde", "timer", "timid"
+        1420 DATA "tipsy", "titan", "tithe", "title", "toast"
+        1421 DATA "today", "toddy", "token", "tonal", "tonga"
+        1422 DATA "tonic", "tooth", "topaz", "topic", "torch"
+        1423 DATA "torso", "torus", "total", "totem", "touch"
+        1424 DATA "tough", "towel", "tower", "toxic", "toxin"
+        1425 DATA "trace", "track", "tract", "trade", "trail"
+        1426 DATA "train", "trait", "tramp", "trash", "trawl"
+        1427 DATA "tread", "treat", "trend", "triad", "trial"
+        1428 DATA "tribe", "trice", "trick", "tried", "tripe"
+        1429 DATA "trite", "troll", "troop", "trope", "trout"
+        1430 DATA "trove", "truce", "truck", "truer", "truly"
+        1431 DATA "trump", "trunk", "truss", "trust", "truth"
+        1432 DATA "tryst", "tubal", "tuber", "tulip", "tulle"
+        1433 DATA "tumor", "tunic", "turbo", "tutor", "twang"
+        1434 DATA "tweak", "tweed", "tweet", "twice", "twine"
+        1435 DATA "twirl", "twist", "twixt", "tying"
+        1436 DATA "udder", "ulcer", "ultra", "umbra", "uncle"
+        1437 DATA "uncut", "under", "undid", "undue", "unfed"
+        1438 DATA "unfit", "unify", "union", "unite", "unity"
+        1439 DATA "unlit", "unmet", "unset", "untie", "until"
+        1440 DATA "unwed", "unzip", "upper", "upset", "urban"
+        1441 DATA "urine", "usage", "usher", "using", "usual"
+        1442 DATA "usurp", "utile", "utter"
+        1443 DATA "vague", "valet", "valid", "valor", "value"
+        1444 DATA "valve", "vapid", "vapor", "vault", "vaunt"
+        1445 DATA "vegan", "venom", "venue", "verge", "verse"
+        1446 DATA "verso", "verve", "vicar", "video", "vigil"
+        1447 DATA "vigor", "villa", "vinyl", "viola", "viper"
+        1448 DATA "viral", "virus", "visit", "visor", "vista"
+        1449 DATA "vital", "vivid", "vixen", "vocal", "vodka"
+        1450 DATA "vogue", "voice", "voila", "vomit", "voter"
+        1451 DATA "vouch", "vowel", "vying"
+        1452 DATA "wacky", "wafer", "wager", "wagon", "waist"
+        1453 DATA "waive", "waltz", "warty", "waste", "watch"
+        1454 DATA "water", "waver", "waxen", "weary", "weave"
+        1455 DATA "wedge", "weedy", "weigh", "weird", "welch"
+        1456 DATA "welsh", "whack", "whale", "wharf", "wheat"
+        1457 DATA "wheel", "whelp", "where", "which", "whiff"
+        1458 DATA "while", "whine", "whiny", "whirl", "whisk"
+        1459 DATA "white", "whole", "whoop", "whose", "widen"
+        1460 DATA "wider", "widow", "width", "wield", "wight"
+        1461 DATA "willy", "wimpy", "wince", "winch", "windy"
+        1462 DATA "wiser", "wispy", "witch", "witty", "woken"
+        1463 DATA "woman", "women", "woody", "wooer", "wooly"
+        1464 DATA "woozy", "wordy", "world", "worry", "worse"
+        1465 DATA "worst", "worth", "would", "wound", "woven"
+        1466 DATA "wrack", "wrath", "wreak", "wreck", "wrest"
+        1467 DATA "wring", "wrist", "write", "wrong", "wrote"
+        1468 DATA "wrung", "wryly"
+        1469 DATA "yacht", "yearn", "yeast", "yield", "young"
+        1470 DATA "youth"
+        1471 DATA "zebra", "zesty", "zonal"
+      #+END_SRC
+
+***** Build and Run
+      :PROPERTIES:
+      :CUSTOM_ID: programs-wordle-build-and-run
+      :END:
+
+      #+BEGIN_SRC sh :dir (file-name-directory buffer-file-name)
+        cd wordle
+        make clean && make && x64sc wordle.prg &
+      #+END_SRC
+
+* .gitignore
+  :PROPERTIES:
+  :CUSTOM_ID: dot-gitignore
+  :END:
+
+  #+BEGIN_SRC conf-unix :tangle .gitignore
+    ,*.tmp
+  #+END_SRC
+
+* README.org
+  :PROPERTIES:
+  :CUSTOM_ID: readme-dot-org
+  :END:
+
+  #+BEGIN_SRC org :tangle README.org
+    ,* BASIC Programs for the C64
+
+      See the "Build and Run" sections of [[file:c64-basic.org][c64-basic.org]] to see how to build, clean,
+      and run these applications using the VICE emulator. In general you follow
+      these steps:
+
+      Build with =make=.
+
+      Clean with =make clean=.
+
+      Run with =x64sc NAME.prg=.
+
+      All files are generated from [[file:c64-basic.org][c64-basic.org]] using Emacs' org-mode literate
+      programming system to "tangle" them.
+
+      <<copyright>>
+
+      License: [[file:LICENSE][MIT License]]
+
+    ,*** [[hello-world][Hello World]]
+
+        Print "HELLO WORLD!".
+
+    ,*** [[screen-size][Screen Size]]
+
+        Display the screen dimensions.
+
+    ,*** [[wordle][Wordle]]
+
+        Play the Wordle game.
+
+        ,#+NAME: Wordle Picture
+        [[file:wordle/wordle.png][file:wordle/wordle.png]]
+  #+END_SRC
+
+* LICENSE
+  :PROPERTIES:
+  :CUSTOM_ID: license
+  :END:
+
+  #+BEGIN_SRC text :tangle LICENSE
+    <<license-header>>
+  #+END_SRC
