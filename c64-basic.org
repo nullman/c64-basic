@@ -8,7 +8,7 @@
   #+LANGUAGE: en
   #+PROPERTY: header-args :tangle no :noweb yes :padline yes :comments none :results silent :dir /tmp :mkdirp yes
   #+STARTUP: noindent odd overview
-  #+TIMESTAMP: <2023-07-08 13:01 (kyle)>
+  #+TIMESTAMP: <2023-07-08 19:54 (kyle)>
 
   Steps to create a d64 image containing a BASIC program:
 
@@ -241,52 +241,70 @@
         21 POKE 53280, 0 : REM black screenframe
         22 POKE 53281, 0 : REM black screen
         23 POKE 646, 1 : REM white text
-        30 R = RND(0)
         100 PRINT "WORDLE"
         101 PRINT
-        110 R = INT(RND(1) * 2309) + 1 : REM random word number
-        111 N = 0 : REM number of guesses
+        102 PRINT "       12345"
+        110 R = RND(0) : REM randomize random number seed
+        111 R = INT(RND(1) * 2309) + 1 : REM random word index
+        112 N = 0 : REM number of guesses
         120 DIM L$(5) : REM letters in word
-        120 DIM C$(5) : REM letters in current guess
-        121 DIM M(5) : REM matching letters for current guess
-        210 FOR I = 1 TO R
-        211 READ W$ : REM random word
-        212 NEXT
-        220 FOR I = 1 TO 5
-        221 L$(I) = MID$(W$, I, 1)
-        222 NEXT I
-        300 INPUT "Guess"; G$
-        301 N = N + 1
-        310 IF LEN(G$) <> 5 GOTO 300
-        320 FOR I = 1 TO 5
-        321 C$(I) = MID$(G$, I, 1) : REM current guess letters
-        322 M(I) = 0 : REM set to no match
-        323 NEXT I
+        121 DIM C$(5) : REM letters in current guess
+        122 DIM M(5) : REM matching letters for current guess
+        200 GOSUB 500 : REM store random word into W$
+        210 GOSUB 510 : REM copy W$ letters into L$
+        300 REM guess input loop
+        310 GOSUB 520 : REM input guess from user into G$
+        320 GOSUB 530 : REM copy G$ letters into C$ and clear M
         330 FOR I = 1 TO 5
-        340 IF L$(I) <> C$(I) GOTO 350
-        341 M(I) = I : REM letter and position match
-        342 GOTO 390
+        340 REM check for letter and position match
+        341 IF L$(I) = C$(I) THEN M(I) = I : GOTO 390
         350 J = 0
-        360 J = J + 1
-        361 IF J > 5 GOTO 390
-        362 IF J = I GOTO 360
-        370 IF L$(I) = C$(J) GOTO 380
-        371 GOTO 360 : REM no match
-        380 IF M(J) > 0 GOTO 360 : REM previous letter match
-        381 M(J) = I : REM letter but not position match
-        382 GOTO 390
+        360 REM loop through letters checking for matches
+        361 J = J + 1
+        362 IF J > 5 GOTO 390
+        363 IF J = I OR L$(I) <> C$(J) GOTO 360
+        370 REM check for previous letter match
+        371 IF M(J) > 0 GOTO 360
+        380 REM letter but not position match
+        381 M(J) = I
         390 NEXT I
-        400 C = 0
-        410 PRINT "       ";
-        411 FOR I = 1 TO 5
-        412 IF M(I) = I THEN POKE 646,5 : PRINT C$(I); : C = C + 1 : GOTO 420
-        413 IF M(I) > 0 THEN POKE 646,8 : PRINT C$(I); : GOTO 420
-        414 POKE 646,1 : PRINT "-";
-        420 NEXT I
-        421 PRINT
-        422 POKE 646,1
-        430 IF C <> 5 GOTO 300
-        440 PRINT : PRINT "You guessed the word in"; STR$(N); " tries"
+        400 GOSUB 540 : REM output result; C = 5 if correct
+        410 IF C <> 5 GOTO 300
+        420 PRINT : PRINT "You guessed the word in"; STR$(N); " tries"
+        430 END
+        500 REM store random word into $W
+        501 FOR I = 1 TO R
+        502 READ W$
+        503 NEXT
+        509 RETURN
+        510 REM copy W$ letters into L$
+        511 FOR I = 1 TO 5
+        512 L$(I) = MID$(W$, I, 1)
+        513 NEXT I
+        519 RETURN
+        520 REM input guess from user into G$
+        521 INPUT "Guess"; G$
+        522 N = N + 1
+        523 IF LEN(G$) = 5 GOTO 529
+        524 PRINT "Invalid length (five letters only)"
+        525 GOTO 520
+        529 RETURN
+        530 REM copy G$ letters into C$ and clear M
+        531 FOR I = 1 TO 5
+        532 C$(I) = MID$(G$, I, 1) : REM current guess letters
+        533 M(I) = 0 : REM set to no match
+        534 NEXT I
+        539 RETURN
+        540 REM output result; C = 5 if correct
+        541 C = 0
+        542 PRINT "       ";
+        543 FOR I = 1 TO 5
+        544 IF M(I) = I THEN POKE 646,5 : PRINT C$(I); : C = C + 1 : GOTO 547
+        545 IF M(I) > 0 THEN POKE 646,8 : PRINT C$(I); : GOTO 547
+        546 POKE 646,1 : PRINT "-";
+        547 NEXT I
+        548 PRINT : POKE 646,1
+        549 RETURN
       #+END_SRC
 
 ***** Word List
