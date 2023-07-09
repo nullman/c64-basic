@@ -2,73 +2,73 @@
 11 REM Copyright © 2023 Kyle W T Sherman
 12 REM MIT License
 20 PRINT CHR$(147) : REM clear screen
-21 POKE 53280, 0 : REM black screenframe
-22 POKE 53281, 0 : REM black screen
-23 POKE 646, 1 : REM white text
-100 PRINT "WORDLE"
-101 PRINT
-102 PRINT "       12345"
-110 R = RND(0) : REM randomize random number seed
-111 R = INT(RND(1) * 2309) + 1 : REM random word index
-112 N = 0 : REM number of guesses
+30 POKE 53280, 0 : REM black screenframe
+40 POKE 53281, 0 : REM black screen
+50 POKE 646, 1 : REM white text
+60 PRINT "WORDLE"
+70 PRINT
+80 PRINT "       12345"
+90 R = RND(0) : REM randomize random number seed
+100 R = INT(RND(1) * 2309) + 1 : REM random word index
+110 N = 0 : REM number of guesses
 120 DIM L$(5) : REM letters in word
-121 DIM C$(5) : REM letters in current guess
-122 DIM M(5) : REM matching letters for current guess
-200 GOSUB 500 : REM store random word into W$
-210 GOSUB 510 : REM copy W$ letters into L$
-300 REM guess input loop
-310 GOSUB 520 : REM input guess from user into G$
-320 GOSUB 530 : REM copy G$ letters into C$ and clear M
-330 FOR I = 1 TO 5
-340 REM check for letter and position match
-341 IF L$(I) = C$(I) THEN M(I) = I : GOTO 390
-350 J = 0
-360 REM loop through letters checking for matches
-361 J = J + 1
-362 IF J > 5 GOTO 390
-363 IF J = I OR L$(I) <> C$(J) GOTO 360
-370 REM check for previous letter match
-371 IF M(J) > 0 GOTO 360
-380 REM letter but not position match
-381 M(J) = I
-390 NEXT I
-400 GOSUB 540 : REM output result; C = 5 if correct
-410 IF C <> 5 GOTO 300
-420 PRINT : PRINT "You guessed the word in"; STR$(N); " tries"
-430 END
-500 REM store random word into $W
-501 FOR I = 1 TO R
-502 READ W$
-503 NEXT
-509 RETURN
-510 REM copy W$ letters into L$
-511 FOR I = 1 TO 5
-512 L$(I) = MID$(W$, I, 1)
-513 NEXT I
-519 RETURN
-520 REM input guess from user into G$
-521 INPUT "Guess"; G$
-522 N = N + 1
-523 IF LEN(G$) = 5 GOTO 529
-524 PRINT "Invalid length (five letters only)"
-525 GOTO 520
-529 RETURN
-530 REM copy G$ letters into C$ and clear M
-531 FOR I = 1 TO 5
-532 C$(I) = MID$(G$, I, 1) : REM current guess letters
-533 M(I) = 0 : REM set to no match
-534 NEXT I
-539 RETURN
-540 REM output result; C = 5 if correct
-541 C = 0
-542 PRINT "       ";
-543 FOR I = 1 TO 5
-544 IF M(I) = I THEN POKE 646,5 : PRINT C$(I); : C = C + 1 : GOTO 547
-545 IF M(I) > 0 THEN POKE 646,8 : PRINT C$(I); : GOTO 547
-546 POKE 646,1 : PRINT "-";
-547 NEXT I
-548 PRINT : POKE 646,1
-549 RETURN
+130 DIM C$(5) : REM letters in current guess
+140 DIM M(5) : REM matching letters for current guess
+150 GOSUB 370 : REM store random word into W$
+160 GOSUB 420 : REM copy W$ letters into L$
+170 REM guess input loop
+180 GOSUB 470 : REM input guess from user into G$
+190 GOSUB 540 : REM copy G$ letters into C$ and clear M
+200 FOR I = 1 TO 5
+210 REM check for letter and position match
+220 IF L$(I) = C$(I) THEN M(I) = I : GOTO 320
+230 J = 0
+240 REM loop through letters checking for matches
+250 J = J + 1
+260 IF J > 5 GOTO 320
+270 IF J = I OR L$(I) <> C$(J) GOTO 240
+280 REM check for previous letter match
+290 IF M(J) > 0 GOTO 240
+300 REM letter but not position match
+310 M(J) = I
+320 NEXT I
+330 GOSUB 600 : REM output result; C = 5 if correct
+340 IF C <> 5 GOTO 170
+350 PRINT : PRINT "You guessed the word in"; STR$(N); " tries"
+360 END
+370 REM store random word into $W
+380 FOR I = 1 TO R
+390 READ W$
+400 NEXT
+410 RETURN
+420 REM copy W$ letters into L$
+430 FOR I = 1 TO 5
+440 L$(I) = MID$(W$, I, 1)
+450 NEXT I
+460 RETURN
+470 REM input guess from user into G$
+480 INPUT "Guess"; G$
+490 N = N + 1
+500 IF LEN(G$) = 5 GOTO 530
+510 PRINT "Invalid length (five letters only)"
+520 GOTO 470
+530 RETURN
+540 REM copy G$ letters into C$ and clear M
+550 FOR I = 1 TO 5
+560 C$(I) = MID$(G$, I, 1) : REM current guess letters
+570 M(I) = 0 : REM set to no match
+580 NEXT I
+590 RETURN
+600 REM output result; C = 5 if correct
+610 C = 0
+620 PRINT "       ";
+630 FOR I = 1 TO 5
+640 IF M(I) = I THEN POKE 646,5 : PRINT C$(I); : C = C + 1 : GOTO 670
+650 IF M(I) > 0 THEN POKE 646,8 : PRINT C$(I); : GOTO 670
+660 POKE 646,1 : PRINT "-";
+670 NEXT I
+680 PRINT : POKE 646,1
+690 RETURN
 
 1000 REM word list
 1001 DATA "aback", "abase", "abate", "abbey", "abbot"
