@@ -13,13 +13,13 @@
   All files are generated from [[file:c64-basic.org][c64-basic.org]] using Emacs' org-mode literate
   programming system to "tangle" them.
 
-  Copyright © 2023 Kyle W T Sherman
+  Copyright © 2023-2024 Kyle W T Sherman
 
   License: [[file:LICENSE][MIT License]]
 
 *** [[hello-world][Hello World]]
 
-    Print "HELLO WORLD!".
+    Print "HELLO, WORLD!".
 
 *** [[screen-size][Screen Size]]
 

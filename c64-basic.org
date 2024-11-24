@@ -8,7 +8,7 @@
   #+LANGUAGE: en
   #+PROPERTY: header-args :tangle no :noweb yes :padline yes :comments none :results silent :dir /tmp :mkdirp yes
   #+STARTUP: noindent odd overview
-  #+TIMESTAMP: <2023-07-09 15:33 (kyle)>
+  #+TIMESTAMP: <2024-11-24 11:15 (user)>
 
   Steps to create a d64 image containing a BASIC program:
 
@@ -133,7 +133,7 @@
 
       #+BEGIN_SRC basic :tangle hello-world/helloworld.bas
         10 REM Hello World
-        20 PRINT "Hello World!"
+        20 PRINT "Hello, world!"
       #+END_SRC
 
 ***** Build and Run
@@ -833,7 +833,7 @@
 
     ,*** [[hello-world][Hello World]]
 
-        Print "HELLO WORLD!".
+        Print "HELLO, WORLD!".
 
     ,*** [[screen-size][Screen Size]]
 
