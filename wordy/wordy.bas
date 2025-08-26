@@ -1,11 +1,11 @@
-10 REM Wordle
-11 REM Copyright © 2023 Kyle W T Sherman
+10 REM Wordy
+11 REM Copyright © 2023-2025 Kyle W T Sherman
 12 REM MIT License
 20 PRINT CHR$(147) : REM clear screen
 30 POKE 53280, 0 : REM black screenframe
 40 POKE 53281, 0 : REM black screen
 50 POKE 646, 1 : REM white text
-60 PRINT "WORDLE"
+60 PRINT "WORDY"
 70 PRINT
 80 PRINT "       12345"
 90 R = RND(0) : REM randomize random number seed

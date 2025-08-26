@@ -13,7 +13,7 @@
   All files are generated from [[file:c64-basic.org][c64-basic.org]] using Emacs' org-mode literate
   programming system to "tangle" them.
 
-  Copyright © 2023-2024 Kyle W T Sherman
+  Copyright © 2023-2025 Kyle W T Sherman
 
   License: [[file:LICENSE][MIT License]]
 
@@ -25,9 +25,9 @@
 
     Display the screen dimensions.
 
-*** [[wordle][Wordle]]
+*** [[wordy][Wordy]]
 
-    Play the Wordle game.
+    Play the Wordy game. (Based on the NYT Wordle game.)
 
-    #+NAME: Wordle Picture
-    [[file:wordle/wordle.png][file:wordle/wordle.png]]
+    #+NAME: Wordy Picture
+    [[file:wordy/wordy.png][file:wordy/wordy.png]]

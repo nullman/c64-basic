@@ -8,7 +8,7 @@
   #+LANGUAGE: en
   #+PROPERTY: header-args :tangle no :noweb yes :padline yes :comments none :results silent :dir /tmp :mkdirp yes
   #+STARTUP: noindent odd overview
-  #+TIMESTAMP: <2024-11-24 11:15 (user)>
+  #+TIMESTAMP: <2025-08-26 12:20 (user)>
 
   Steps to create a d64 image containing a BASIC program:
 
@@ -206,42 +206,42 @@
         make clean && make && x64sc screensize.prg &
       #+END_SRC
 
-*** Wordle
+*** Wordy
     :PROPERTIES:
-    :CUSTOM_ID: programs-wordle
+    :CUSTOM_ID: programs-wordy
     :END:
 
 ***** Makefile
       :PROPERTIES:
-      :CUSTOM_ID: programs-wordle-makefile
+      :CUSTOM_ID: programs-wordy-makefile
       :END:
 
-      #+BEGIN_SRC makefile :tangle wordle/Makefile
+      #+BEGIN_SRC makefile :tangle wordy/Makefile
         .RECIPEPREFIX = >
 
-        all: wordle.prg
+        all: wordy.prg
 
-        wordle.prg:
-        > cat wordle.bas | tr '[A-Z]' '[a-z]' > wordle.tmp
-        > petcat -w2 -o wordle.prg -- wordle.tmp
+        wordy.prg:
+        > cat wordy.bas | tr '[A-Z]' '[a-z]' > wordy.tmp
+        > petcat -w2 -o wordy.prg -- wordy.tmp
 
         clean:
         > rm -f *.prg *.tmp
       #+END_SRC
 
-***** Wordle
+***** Wordy
       :PROPERTIES:
-      :CUSTOM_ID: programs-wordle-wordle
+      :CUSTOM_ID: programs-wordy-wordy
       :END:
 
-      #+BEGIN_SRC basic :tangle wordle/wordle.bas
-        10 REM Wordle
+      #+BEGIN_SRC basic :tangle wordy/wordy.bas
+        10 REM Wordy
         <<header>>
         20 PRINT CHR$(147) : REM clear screen
         30 POKE 53280, 0 : REM black screenframe
         40 POKE 53281, 0 : REM black screen
         50 POKE 646, 1 : REM white text
-        60 PRINT "WORDLE"
+        60 PRINT "WORDY"
         70 PRINT
         80 PRINT "       12345"
         90 R = RND(0) : REM randomize random number seed
@@ -309,10 +309,10 @@
 
 ***** Word List
       :PROPERTIES:
-      :CUSTOM_ID: programs-wordle-word-list
+      :CUSTOM_ID: programs-wordy-word-list
       :END:
 
-      #+BEGIN_SRC basic :tangle wordle/wordle.bas
+      #+BEGIN_SRC basic :tangle wordy/wordy.bas
         1000 REM word list
         1001 DATA "aback", "abase", "abate", "abbey", "abbot"
         1002 DATA "abhor", "abide", "abled", "abode", "abort"
@@ -789,12 +789,12 @@
 
 ***** Build and Run
       :PROPERTIES:
-      :CUSTOM_ID: programs-wordle-build-and-run
+      :CUSTOM_ID: programs-wordy-build-and-run
       :END:
 
       #+BEGIN_SRC sh :dir (file-name-directory buffer-file-name)
-        cd wordle
-        make clean && make && x64sc wordle.prg &
+        cd wordy
+        make clean && make && x64sc wordy.prg &
       #+END_SRC
 
 * .gitignore
@@ -803,7 +803,7 @@
   :END:
 
   #+BEGIN_SRC conf-unix :tangle .gitignore
-    ,*.tmp
+    ,*\.tmp
   #+END_SRC
 
 * README.org
@@ -839,12 +839,12 @@
 
         Display the screen dimensions.
 
-    ,*** [[wordle][Wordle]]
+    ,*** [[wordy][Wordy]]
 
-        Play the Wordle game.
+        Play the Wordy game. (Based on the NYT Wordle game.)
 
-        ,#+NAME: Wordle Picture
-        [[file:wordle/wordle.png][file:wordle/wordle.png]]
+        ,#+NAME: Wordy Picture
+        [[file:wordy/wordy.png][file:wordy/wordy.png]]
   #+END_SRC
 
 * LICENSE
