@@ -1,2 +1,2 @@
-10 REM Hello World
-20 PRINT "Hello, world!"
+10 REM HELLO WORLD
+20 PRINT "HELLO, WORLD!"
